@@ -1,21 +1,26 @@
 #!/bin/bash
 if [ "$__MULTI_TRAP_MAP" == "" ]; then
     __MULTI_TRAP_MAP="defined"
+    source bash-multi-trap-constants.sh
 
-    __multi_trap_map="";
-    #__multi_trap_map="baby/face:chocolate/shake"
-    __multi_trap_map_rec_separator=':'
-    __multi_trap_map_field_separator='/'
+    __multi_trap_map=""
+    __multi_trap_counter=0
     
     function __multi_trap_add(){
         local __name=$1
         local __value=$2
-        __multi_trap_map="$__multi_trap_map:$__name/$__value"
+        if [ $__multi_trap_counter -gt -0 ]; then 
+             __multi_trap_map="$__multi_trap_map:$__name/$__value"
+	else
+             __multi_trap_map="$__name/$__value"
+	fi
+	__multi_trap_counter=$((__multi_trap_counter + 1))
     }
     
     
     #Dumb search.  Switch to hash table if curr map too big:
     function __multi_trap_remove(){
+        __trap_err_clear_errcode
         if [ '$__multi_trap_map' == ""]; then
             return 0
         fi
@@ -53,6 +58,7 @@ if [ "$__MULTI_TRAP_MAP" == "" ]; then
         done
         IFS="$__ifs_curr"
         __multi_trap_map="$__new_map"
+	__multi_trap_counter=$((__multi_trap_counter - 1))
     }
     
     function __multi_trap_run(){
